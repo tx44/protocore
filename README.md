@@ -3,7 +3,7 @@
 [![docker][docker-img]][docker]
 
 [docker]: https://hub.docker.com/r/teryaew/protocore
-[docker-img]: https://img.shields.io/docker/v/teryaew/protocore.svg
+[docker-img]: https://img.shields.io/docker/v/teryaew/protocore
 
 Protobuf compiler image with built-in plugins.
 

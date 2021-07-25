@@ -60,14 +60,10 @@ ARG GRPC_JAVA_VERSION
 RUN wget https://repo1.maven.org/maven2/io/grpc/protoc-gen-grpc-java/${GRPC_JAVA_VERSION}/protoc-gen-grpc-java-${GRPC_JAVA_VERSION}-linux-x86_64.exe -O /protoc-gen-grpc-java
 RUN chmod +x /protoc-gen-grpc-java
 
-# DART PLUGIN
-FROM google/dart AS dart-builder
-RUN pub global activate protoc_plugin
-RUN cp $HOME/.pub-cache/bin/protoc-gen-dart /protoc-gen-dart
-
 # FINAL IMAGE
-# GOTCHA: Don't use Alpine cause of incompatibity with `grpc_node_plugin` binary
-FROM ubuntu:latest
+# GOTCHA: Don't use Alpine cause of incompatibity with `grpc_node_plugin` binary (use f.ex. Ubuntu)
+# GOTCHA 2: Dart plugin needs Dart runtime :(
+FROM google/dart:latest
 
 ARG DST=/usr/local/bin
 ARG GOOGLEAPIS_PATH=/googleapis
@@ -82,7 +78,10 @@ COPY --from=go-builder /go/bin/protoc-gen-doc ${DST}/protoc-gen-doc
 COPY --from=web-builder /protoc-gen-grpc-web ${DST}/protoc-gen-grpc-web
 COPY --from=node-builder /dist/grpc_node_plugin ${DST}/protoc-gen-grpc
 COPY --from=java-builder /protoc-gen-grpc-java ${DST}/protoc-gen-grpc-java
-COPY --from=dart-builder /protoc-gen-dart ${DST}/protoc-gen-dart
+
+# DART PLUGIN finally
+RUN pub global activate protoc_plugin
+RUN cp $HOME/.pub-cache/bin/protoc-gen-dart ${DST}/protoc-gen-dart
 
 WORKDIR /src
 

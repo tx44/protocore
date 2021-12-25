@@ -47,11 +47,11 @@ RUN nexe \
 FROM base AS node-builder
 RUN mkdir -p /dist
 # Otherwise download via `npm i grpc-tools`
-RUN wget https://node-precompiled-binaries.grpc.io/grpc-tools/v1.9.1/linux-x64.tar.gz -O- | tar -xz --strip 1 -C /dist
+RUN wget https://node-precompiled-binaries.grpc.io/grpc-tools/v1.11.2/linux-x64.tar.gz -O- | tar -xz --strip 1 -C /dist
 
 # WEB PLUGIN
 FROM base AS web-builder
-RUN wget https://github.com/grpc/grpc-web/releases/download/1.2.0/protoc-gen-grpc-web-1.2.0-linux-x86_64 -O /protoc-gen-grpc-web
+RUN wget https://github.com/grpc/grpc-web/releases/download/1.3.0/protoc-gen-grpc-web-1.3.0-linux-x86_64 -O /protoc-gen-grpc-web
 RUN chmod +x /protoc-gen-grpc-web
 
 # JAVA PLUGIN

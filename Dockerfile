@@ -8,12 +8,11 @@ RUN apk add --no-cache wget
 # It is trivially fast to just compile our own optimized and stripped binary
 # distribution of the go protoc plugin, so just do that instead of messing with
 # finding a binary distribution we like.
-FROM golang:1.15-alpine AS go-builder
+FROM golang:1.17-alpine AS go-builder
 RUN apk add --no-cache git upx
-ENV GO111MODULE=on
 RUN go get -ldflags="-s -w" \
-    github.com/golang/protobuf/protoc-gen-go@v1.4.2 \
-    github.com/pseudomuto/protoc-gen-doc/cmd/protoc-gen-doc@v1.3.2
+    github.com/golang/protobuf/protoc-gen-go@v1.5.2 \
+    github.com/pseudomuto/protoc-gen-doc/cmd/protoc-gen-doc@v1.5.0
 RUN upx /go/bin/*
 
 # TYPESCRIPT PLUGIN ALTERNATIVE
@@ -30,10 +29,10 @@ RUN upx /go/bin/*
 # itself is only ~1.5mb -- however having a single file makes it easier to deal
 # with and UPX compress it later which will be smaller, so we deal with some
 # upfront cost here.
-FROM node:12-alpine AS ts-builder
+FROM node:17-alpine AS ts-builder
 RUN apk add --no-cache upx
 RUN mkdir -p /dist
-RUN npm install --unsafe-perm -g ts-protoc-gen@0.12.0 nexe@3.3.7
+RUN npm install --unsafe-perm -g ts-protoc-gen@0.15.0 nexe@3.3.7
 WORKDIR /usr/local/lib/node_modules/ts-protoc-gen/lib
 RUN nexe \
     --output /dist/protoc-gen-ts \

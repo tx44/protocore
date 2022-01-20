@@ -59,6 +59,12 @@ ARG GRPC_JAVA_VERSION
 RUN wget https://repo1.maven.org/maven2/io/grpc/protoc-gen-grpc-java/${GRPC_JAVA_VERSION}/protoc-gen-grpc-java-${GRPC_JAVA_VERSION}-linux-x86_64.exe -O /protoc-gen-grpc-java
 RUN chmod +x /protoc-gen-grpc-java
 
+# PYTHON PLUGIN
+FROM python:3.10.2 AS python-builder
+RUN pip install grpcio grpcio-tools pyinstaller
+RUN pyinstaller --onefile /usr/local/lib/python3.10/site-packages/grpc_tools/protoc.py --distpath=/dist --name=grpc-python-protoc
+RUN chmod +x /dist/grpc-python-protoc
+
 # FINAL IMAGE
 # GOTCHA: Don't use Alpine cause of incompatibity with `grpc_node_plugin` binary (use f.ex. Ubuntu)
 # GOTCHA 2: Dart plugin needs Dart runtime :(
@@ -77,6 +83,7 @@ COPY --from=go-builder /go/bin/protoc-gen-doc ${DST}/protoc-gen-doc
 COPY --from=web-builder /protoc-gen-grpc-web ${DST}/protoc-gen-grpc-web
 COPY --from=node-builder /dist/grpc_node_plugin ${DST}/protoc-gen-grpc
 COPY --from=java-builder /protoc-gen-grpc-java ${DST}/protoc-gen-grpc-java
+COPY --from=python-builder /dist/grpc-python-protoc ${DST}/protoc-gen-grpc-python
 
 # DART PLUGIN finally
 RUN pub global activate protoc_plugin
